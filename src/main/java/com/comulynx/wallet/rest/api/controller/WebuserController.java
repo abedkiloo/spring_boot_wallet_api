@@ -38,7 +38,7 @@ public class WebuserController {
     public ResponseEntity<?> createWebuser(@RequestBody Webuser webuser) {
 
         try {
-            // TODO : Add logic to check if Webuser with provided username, or
+            //   logic to check if Webuser with provided username, or
             // email, or employeeId, or customerId exists.
             // If exists, throw a Webuser with [?] exists Exception.
 
@@ -54,10 +54,6 @@ public class WebuserController {
             if (checkUserWithCustomerId(webuser.getCustomerId())) {
                 return new ResponseEntity<>("Webuser with employee customer id " + webuser.getCustomerId() + " exists", HttpStatus.NOT_FOUND);
             }
-//            webuserRepository.findByEmail(webuser.getEmail())
-//                    .orElseThrow(() -> new ResourceNotFoundException("Webuser with employee email " + webuser.getEmail() + " exists"));
-//            return ResponseEntity.ok().body(checkUserWithUserNameId(webuser.getUsername()));
-
             return ResponseEntity.ok().body(webuserRepository.save(webuser));
         } catch (Exception ex) {
             return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);

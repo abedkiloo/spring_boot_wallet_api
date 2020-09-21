@@ -16,54 +16,61 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
-@RequestMapping(AppUtils.BASE_URL+"/accounts")
+@RequestMapping(AppUtils.BASE_URL + "/accounts")
 public class AccountController {
-	private Gson gson = new Gson();
+    private Gson gson = new Gson();
 
-	@Autowired
-	private AccountRepository accountRepository;
+    @Autowired
+    private AccountRepository accountRepository;
 
-	@GetMapping("/")
-	public List<Account> getAllAccount() {
-		return accountRepository.findAll();
-	}
+    @GetMapping("/")
+    public List<Account> getAllAccount() {
+        return accountRepository.findAll();
+    }
 
-	@GetMapping("/{searchId}")
-	public ResponseEntity<?> getAccountByCustomerIdOrAccountNo(
-			@PathVariable(value = "searchId") String customerIdOrAccountNo) throws ResourceNotFoundException {
-		Account account = accountRepository
-				.findAccountByCustomerIdOrAccountNo(customerIdOrAccountNo, customerIdOrAccountNo)
-				.orElseThrow(() -> new ResourceNotFoundException(
-						"Account not found for this searchId :: " + customerIdOrAccountNo));
+    @GetMapping("/{searchId}")
+    public ResponseEntity<?> getAccountByCustomerIdOrAccountNo(
+            @PathVariable(value = "searchId") String customerIdOrAccountNo) throws ResourceNotFoundException {
+        Account account = accountRepository
+                .findAccountByCustomerIdOrAccountNo(customerIdOrAccountNo, customerIdOrAccountNo)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Account not found for this searchId :: " + customerIdOrAccountNo));
 
-		return ResponseEntity.ok().body(account);
-	}
+        return ResponseEntity.ok().body(account);
+    }
 
-	@GetMapping("/balance")
-	public ResponseEntity<?> getAccountBalanceByCustomerIdAndAccountNo(@RequestBody String request)
-			throws ResourceNotFoundException {
-		try {
-			JsonObject response = new JsonObject();
+    @GetMapping("/balance")
+    public ResponseEntity<?> getAccountBalanceByCustomerIdAndAccountNo(@RequestBody String request)
+            throws ResourceNotFoundException {
 
-			final JsonObject balanceRequest = gson.fromJson(request, JsonObject.class);
-			String customerId = balanceRequest.get("customerId").getAsString();
-			String accountNo = balanceRequest.get("accountNo").getAsString();
+        try {
+            JsonObject response = new JsonObject();
+//
+            final JsonObject balanceRequest = gson.fromJson(request, JsonObject.class);
+            String customerId = balanceRequest.get("customerId").getAsString();
+            String accountNo = balanceRequest.get("accountNo").getAsString();
 
-			// TODO : Add logic to find account balance by CustomerId And
-			// AccountNo
-			Account account = null;
-			
-			response.addProperty("balance", account.getBalance());
-			return ResponseEntity.ok().body(gson.toJson(response));
-		} catch (Exception ex) {
-			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+//            //  logic to find account balance by CustomerId And
+//            // AccountNo
+            Account account = accountRepository.findAccountByCustomerIdAndAccountNo(
+                    customerId, accountNo
+            ).orElseThrow(() -> new ResourceNotFoundException(
+                    "Account not found for this customer Id ::" + customerId + " or account no  :: " + accountNo + " not found"));
+//
+            response.addProperty("balance", account.getBalance());
 
-		}
-	}
 
-	@PostMapping("/")
-	public Account createAccount(@RequestBody Account account) {
-		return accountRepository.save(account);
-	}
+
+            return ResponseEntity.ok().body(gson.toJson(response));
+        } catch (Exception ex) {
+            return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    @PostMapping("/")
+    public Account createAccount(@RequestBody Account account) {
+        return accountRepository.save(account);
+    }
 
 }
