@@ -11,6 +11,8 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+
 
 @EnableWebSecurity
 public class WebSecurityNew extends WebSecurityConfigurerAdapter {
@@ -54,7 +56,9 @@ public class WebSecurityNew extends WebSecurityConfigurerAdapter {
         source.registerCorsConfiguration("/**", config.applyPermitDefaultValues());
 
 
-        // TODO : Expose Authorization Header here
+        // Expose Authorization Header here
+        config.setExposedHeaders(Arrays.asList("Authorization"));
+
 
         return source;
     }

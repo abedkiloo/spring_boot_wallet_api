@@ -1,28 +1,19 @@
 package com.comulynx.wallet.rest.api.controller;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import com.comulynx.wallet.rest.api.exception.ResourceNotFoundException;
 import com.comulynx.wallet.rest.api.model.Account;
 import com.comulynx.wallet.rest.api.model.Customer;
 import com.comulynx.wallet.rest.api.repository.AccountRepository;
 import com.comulynx.wallet.rest.api.repository.CustomerRepository;
 import com.comulynx.wallet.rest.api.util.AppUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -75,6 +66,15 @@ public class CustomerController {
 			// customerId exists. If exists, throw a Customer with [?] exists
 			// Exception.
 
+			if (checkUserWithEmail(customer.getEmail())) {
+				return new ResponseEntity<>("Webuser with employee email " + customer.getEmail() + " exists", HttpStatus.NOT_FOUND);
+			}
+			if (checkUserWithCustomerId(customer.getCustomerId())) {
+				return new ResponseEntity<>("Webuser with employee customer id " + customer.getCustomerId() + " exists", HttpStatus.NOT_FOUND);
+			}
+
+
+
 			String accountNo = generateAccountNo(customer.getCustomerId());
 			Account account = new Account();
 			account.setCustomerId(customer.getCustomerId());
@@ -88,6 +88,18 @@ public class CustomerController {
 
 		}
 	}
+
+
+
+
+	public boolean checkUserWithCustomerId(String customerId) {
+		return customerRepository.findByCustomerId(customerId).isPresent();
+	}
+
+	public boolean checkUserWithEmail(String email) {
+		return customerRepository.findByEmail(email).isPresent();
+	}
+
 
 	@PutMapping("/{customerId}")
 	public ResponseEntity<Customer> updateCustomer(@PathVariable(value = "customerId") String customerId,
